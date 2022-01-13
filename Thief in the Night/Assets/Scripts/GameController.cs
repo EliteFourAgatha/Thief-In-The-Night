@@ -72,11 +72,6 @@ public class GameController : MonoBehaviour
         {
             bandit.SetActive(false);
         }
-        foreach(GameObject loot in lootArray)
-        {
-            loot.SetActive(true);
-        }
-        SpawnLoot();
         StartCoroutine(SpawnBanditsAndWait());
     }
     public void EnableGameOverScreen()
