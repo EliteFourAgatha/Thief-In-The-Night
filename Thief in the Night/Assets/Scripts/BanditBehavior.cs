@@ -85,9 +85,15 @@ public class BanditBehavior : MonoBehaviour
     }
     void OnTriggerEnter2D(Collider2D col)
     {
-        if(col.gameObject.tag == "Handcuffs")
+        if(col.gameObject.tag == "ThrowingKnife")
         {
-            Destroy(col.gameObject);
+            //Get reference to knife RB & stop velocity. Also stop rotation.
+            var knifeRB = col.gameObject.GetComponent<Rigidbody2D>();
+            var knifeScript = col.gameObject.GetComponent<ThrowingKnife>();
+            knifeRB.velocity = Vector2.zero;
+            knifeScript.StopRotation();
+
+            //Bandit count + SFX
             gameController.IncrementBanditCount();
             gameController.PlayBanditCaughtAudio();
             Destroy(gameObject);
