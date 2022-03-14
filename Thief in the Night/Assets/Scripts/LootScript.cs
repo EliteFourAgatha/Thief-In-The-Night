@@ -11,7 +11,6 @@ public class LootScript : MonoBehaviour
     {
         if(col.gameObject.tag == "Bandit")
         {
-            Debug.Log("Collided with loot");
             banditBehavior = col.gameObject.GetComponent<BanditBehavior>();
             banditBehavior.BanditPickUpLoot(gameObject);
         }

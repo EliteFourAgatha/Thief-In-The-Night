@@ -8,7 +8,7 @@ public class ThrowingKnife : MonoBehaviour
     public float rotationSpeed = 2f;
     bool knifeRotated = true;
     bool canPickKnifeUp = false;
-    public float pickupDelay = 2f;
+    public float pickupDelay = 0.5f;
     void Start()
     {
         knifeTransform = gameObject.GetComponent<Transform>();
@@ -16,10 +16,14 @@ public class ThrowingKnife : MonoBehaviour
 
     void Update()
     {
-        WaitForKnifePickup();
+        //WaitForKnifePickup();
         if(knifeRotated)
         {
             RotateKnife();
+        }
+        if(!knifeRotated)
+        {
+            canPickKnifeUp = true;
         }
     }
     private void RotateKnife()
@@ -37,7 +41,6 @@ public class ThrowingKnife : MonoBehaviour
             //If object is not spinning / stopped on wall
             if(canPickKnifeUp)
             {
-                Debug.Log("pickeup?");
                 var knifeSystemRef = col.gameObject.GetComponent<KnifeSystem>();
                 knifeSystemRef.ReplenishDagger();
                 Destroy(gameObject);

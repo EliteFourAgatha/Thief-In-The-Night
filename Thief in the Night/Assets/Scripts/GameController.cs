@@ -13,7 +13,8 @@ public class GameController : MonoBehaviour
     
     AudioSource audioSource;
     public AudioClip catchBanditAudioOne;
-    public AudioListener audioListener;
+    public AudioSource gameMusic;
+    bool audioResumed = false;
 
 
     int currentRound;
@@ -21,9 +22,10 @@ public class GameController : MonoBehaviour
     //Number of bandits to spawn
     int numBandits = 1;
     //Number of bandits caught in game
-    int banditCount;
+    public int banditCount;
 
     public Sprite[] lootSprites;
+    public GameObject loot;
     public GameObject[] lootArray;
     public Transform lootSpawnPosition;
     public RectTransform lootSpawnArea;
@@ -38,7 +40,7 @@ public class GameController : MonoBehaviour
     {
         audioSource = gameObject.GetComponent<AudioSource>();
         Time.timeScale = 1;
-        audioListener.enabled = true;
+        gameMusic.enabled = true;
         currentRound = 1;
         banditCount = 0;
         lootLives = 3;
@@ -77,7 +79,7 @@ public class GameController : MonoBehaviour
     public void EnableGameOverScreen()
     {
         Time.timeScale = 0;
-        audioListener.enabled = false;
+        gameMusic.enabled = false;
         gameOverUI.SetActive(true);
         gameOverCaughtText.text = banditCount.ToString();
     }
@@ -109,6 +111,17 @@ public class GameController : MonoBehaviour
                 lootObjectSR.sprite = lootSprites[lootObjectIndex];
             }
         }
+    }
+    public void RespawnLootAfterBanditCaught()
+    {
+        lootSpawnPosition.position = new Vector3(Random.Range(lootSpawnArea.rect.xMin, lootSpawnArea.rect.xMax),
+            Random.Range(lootSpawnArea.rect.yMin, lootSpawnArea.rect.yMax), 0);
+        
+        GameObject respawnedLoot = Instantiate(loot, lootSpawnPosition.position, Quaternion.identity);
+        
+        SpriteRenderer lootObjectSR = respawnedLoot.GetComponent<SpriteRenderer>();
+        int lootObjectIndex = Random.Range(0, lootSprites.Length);
+        lootObjectSR.sprite = lootSprites[lootObjectIndex];
     }
     IEnumerator SpawnBanditsAndWait()
     {

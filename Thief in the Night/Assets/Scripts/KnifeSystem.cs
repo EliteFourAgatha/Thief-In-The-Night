@@ -45,17 +45,6 @@ public class KnifeSystem : MonoBehaviour
         }
         ChangeKnivesUI();
     }
-    /*
-    private void OnTriggerEnter2D(Collider2D col)
-    {
-        if(col.gameObject.tag == "ThrowingKnife")
-        {
-            ReplenishDagger();
-            Destroy(col.gameObject);
-            Debug.Log("pickedupknifep");
-        }
-    }
-    */
     public void ReplenishDagger()
     {
         currentKnives ++;

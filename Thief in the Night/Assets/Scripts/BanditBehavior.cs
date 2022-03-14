@@ -9,12 +9,15 @@ public class BanditBehavior : MonoBehaviour
     public float banditSpeed = 1f;
 
     private bool holdingLoot;
+    GameObject[] escapeHoles;
+    GameObject chosenEscapeHole;
 
     //Array of treasure, populated at start of level
     GameObject[] availableLoot;
     GameObject closestLoot = null;
     private bool canGrabLoot;
     public GameObject lootOnBandit;
+    public bool banditCanEscape;
     Vector3 banditPosition;
 
     void Start()
@@ -27,6 +30,8 @@ public class BanditBehavior : MonoBehaviour
         availableLoot = GameObject.FindGameObjectsWithTag("Loot");
         // Closest loot determined by FindNearestLoot and returned as GameObject
         closestLoot = FindNearestLoot();
+        escapeHoles = GameObject.FindGameObjectsWithTag("EscapeHole");
+        chosenEscapeHole = ChooseRandomEscapeHole();
     }
     void Update()
     {
@@ -41,6 +46,7 @@ public class BanditBehavior : MonoBehaviour
         else
         {
             canGrabLoot = false;
+            MoveToEscapeHole(chosenEscapeHole);
         }
         MoveToChosenLoot(closestLoot);
     }
@@ -65,10 +71,23 @@ public class BanditBehavior : MonoBehaviour
             transform.position = Vector2.MoveTowards(transform.position, closestObj.transform.position,
                                                 banditSpeed * Time.deltaTime);
         }
+        //If loot not found or taken while bandit moving to grab it, 
+        //  assign new loot
         if(closestObj == null)
         {
             closestObj = FindNearestLoot();
         }
+    }
+    GameObject ChooseRandomEscapeHole()
+    {
+        int randInt = Random.Range(0, escapeHoles.Length);
+        GameObject chosenEscapeHole = escapeHoles[randInt];
+        return chosenEscapeHole;
+    }
+    void MoveToEscapeHole(GameObject chosenEscapeHole)
+    {
+        transform.position = Vector2.MoveTowards(transform.position, chosenEscapeHole.transform.position,
+                                            banditSpeed * Time.deltaTime);
     }
     public void BanditPickUpLoot(GameObject pickedUpLoot)
     {
@@ -77,10 +96,8 @@ public class BanditBehavior : MonoBehaviour
             lootOnBandit.SetActive(true);
             holdingLoot = true;
             pickedUpLoot.gameObject.SetActive(false);
-            AudioSource.PlayClipAtPoint(banditStealSFX, transform.position, 3f);
-            Debug.Log("LOOT STOLEN");
-            gameController.lootLives --;
-            Destroy(gameObject);
+            banditCanEscape = true;
+            banditSpeed *= 1.5f;
         }
     }
     void OnTriggerEnter2D(Collider2D col)
@@ -96,7 +113,22 @@ public class BanditBehavior : MonoBehaviour
             //Bandit count + SFX
             gameController.IncrementBanditCount();
             gameController.PlayBanditCaughtAudio();
+            if(holdingLoot)
+            {
+                lootOnBandit.SetActive(false);
+                holdingLoot = false;
+                gameController.RespawnLootAfterBanditCaught();
+            }
             Destroy(gameObject);
+        }
+        else if(col.gameObject.tag == "EscapeHole")
+        {
+            if(banditCanEscape)
+            {
+                AudioSource.PlayClipAtPoint(banditStealSFX, transform.position, 3f);
+                gameController.lootLives --;
+                Destroy(gameObject);
+            }
         }
     }
 }
